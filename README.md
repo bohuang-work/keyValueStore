@@ -9,6 +9,8 @@ This project implements a fast, scalable Key-Value Store using Python and FastAP
 
 The KV store is stateless, leveraging an in-memory store for quick access, while maintaining data consistency across replicas. It utilizes a leader-election mechanism to synchronize updates across the cluster, offering a robust solution for distributed environments.
 
+![Key-Value Store Architecture](https://github.com/bohuang-work/keyValueStore/blob/main/img/keyValueStore.png)
+
 
 ### Features
 
