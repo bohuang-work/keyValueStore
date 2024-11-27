@@ -20,7 +20,7 @@ The KV store is stateless, leveraging an in-memory store for quick access, while
 - Leader Election: Ensures consistency across replicas with a leader pod managing updates.
 
 
-### Docker build
+### Docker
 
 1. build key value store API:
 ```sh
@@ -43,7 +43,7 @@ docker push bohuang910407/proxy:latest
 ### Deployments
 The deployment configurations are provided in the k8s directory. You can easily deploy the services to a local Kubernetes cluster (e.g., k3d) using the provided script:
 ```sh
-run.sh
+./run.sh
 ```
 
 Access the API swagger on local machine:
