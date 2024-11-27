@@ -46,6 +46,12 @@ The deployment configurations are provided in the k8s directory. You can easily 
 run.sh
 ```
 
+Access the API swagger on local machine:
+```sh
+kubectl port-forward service/kvstore-proxy-service 8001:8001
+```
+then visit: http://localhost:8001/docs
+
 
 ## API Documentation
 
