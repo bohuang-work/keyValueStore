@@ -6,20 +6,30 @@ from fastapi import FastAPI, HTTPException
 from main import KeyValue
 
 app = FastAPI(
-    title="Proxy API",
-    description="This API proxies requests to the leader or replica services.",
+    title="proxy API",
+    description="Proxy API for managing a high performance key-value store.",
     version="1.0.0",
 )
 
-# URLs are passed via environment variables
-LEADER_URL = os.getenv("LEADER_URL", "http://kvsotre/:8000")
-REPLICA_SERVICE_URL = os.getenv("REPLICA_SERVICE_URL", "http://kvsotre/:8000")
+### ConfigMap Variables
+LEADER_URL = os.getenv("LEADER_URL", "http://kvstore-0.kvstore-service:8000")
+KV_STORE_SERVICE_URL = os.getenv(
+    "KV_STORE_SERVICE_URL",
+    "http://kvstore-service:8000",
+)
 
 
+### API Endpoints
 @app.put("/put")
 async def proxy_put_key_value(data: KeyValue):
     """
     Proxy PUT requests to the leader.
+
+    Args:
+        data (KeyValue): The key-value pair to be added or updated.
+
+    Returns:
+        dict: Response from the leader node.
     """
     payload = {"key": data.key, "value": data.value}
 
@@ -31,7 +41,16 @@ async def proxy_put_key_value(data: KeyValue):
 @app.delete("/delete/{key}")
 async def proxy_delete_key(key: str):
     """
-    Proxy DELETE requests to the leader and handle 404 responses.
+    Proxy DELETE requests to the leader.
+
+    Args:
+        key (str): The key to be deleted.
+
+    Raises:
+        HTTPException: If the key is not found or the request fails.
+
+    Returns:
+        dict: Response from the leader node.
     """
     async with httpx.AsyncClient() as client:
         try:
@@ -47,15 +66,20 @@ async def proxy_delete_key(key: str):
 @app.get("/get/{key}")
 async def proxy_get_key_value(key: str):
     """
-    Proxy GET requests to the replica or leader service and handle 404 responses.
+    Proxy GET requests to the leader or replicas using round-robin.
+
+    Args:
+        key (str): The key to retrieve.
+
+    Raises:
+        HTTPException: If the key is not found.
+
+    Returns:
+        dict: The key-value pair retrieved from the store.
     """
     async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(f"{REPLICA_SERVICE_URL}/get/{key}")
-            # If the leader also returns 404 (key not found), raise an exception
-            if response.status_code == 404:
-                raise HTTPException(status_code=404, detail="Key not found.")
+        response = await client.get(f"{KV_STORE_SERVICE_URL}/get/{key}")
 
-            return response.json()
-        except httpx.RequestError as e:
-            raise HTTPException(status_code=500, detail=f"Request failed: {str(e)}")
+    if response.status_code == 404:
+        raise HTTPException(status_code=404, detail="Key not found.")
+    return response.json()

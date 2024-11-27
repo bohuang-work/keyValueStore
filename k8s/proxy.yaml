@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kvstore-proxy
+  labels:
+    app: kvstore-proxy
+spec:
+  replicas: 3  # Set the number of replicas you want for the proxy service
+  selector:
+    matchLabels:
+      app: kvstore-proxy
+  template:
+    metadata:
+      labels:
+        app: kvstore-proxy
+    spec:
+      containers:
+        - name: kvstore-proxy
+          image: bohuang910407/proxy:latest  # Replace with your actual image
+          ports:
+            - containerPort: 8001  # Assuming FastAPI app listens on port 8001 inside the container
+          env:
+            - name: KV_STORE_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: kvstore-config
+                  key: KV_STORE_SERVICE_URL
+          resources:
+            requests:
+              memory: "256Mi"   # Minimum amount of memory the container requires
+              cpu: "250m"       # Minimum amount of CPU the container requires
+            limits:
+              memory: "512Mi"   # Maximum amount of memory the container can use
+              cpu: "500m"       # Maximum amount of CPU the container can use
+                
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kvstore-proxy-service
+spec:
+  selector:
+    app: kvstore-proxy
+  ports:
+    - protocol: TCP
+      port: 8001  # The port on which the proxy service will be accessible
+      targetPort: 8001  # The port inside the container
+  type: ClusterIP  # This is the internal service type, accessible within the cluster

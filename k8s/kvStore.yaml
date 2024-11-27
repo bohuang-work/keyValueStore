@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kvstore
+spec:
+  serviceName: "kvstore-service"
+  replicas: 5
+  selector:
+    matchLabels:
+      app: kvstore
+  template:
+    metadata:
+      labels:
+        app: kvstore
+    spec:
+      containers:
+        - name: kvstore
+          image: bohuang910407/kvstore:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: REPLICA_URLS
+              valueFrom:
+                configMapKeyRef:
+                  name: kvstore-config
+                  key: REPLICA_URLS
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kvstore-service
+spec:
+  selector:
+    app: kvstore
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP

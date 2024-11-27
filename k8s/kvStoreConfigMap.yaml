@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kvstore-config
+data:
+  REPLICA_URLS: "http://kvstore-1.kvstore-service:8000,http://kvstore-2.kvstore-service:8000,http://kvstore-3.kvstore-service:8000,http://kvstore-4.kvstore-service:8000"
+  LEADER_URL: "http://kvstore-0.kvstore-service:8000"
+  KV_STORE_SERVICE_URL: "http://kvstore-service:8000"
