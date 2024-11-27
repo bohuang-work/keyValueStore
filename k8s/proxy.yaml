@@ -5,7 +5,7 @@ metadata:
   labels:
     app: kvstore-proxy
 spec:
-  replicas: 3  # Set the number of replicas you want for the proxy service
+  replicas: 2  # Set the number of replicas you want for the proxy service
   selector:
     matchLabels:
       app: kvstore-proxy
@@ -45,4 +45,4 @@ spec:
     - protocol: TCP
       port: 8001  # The port on which the proxy service will be accessible
       targetPort: 8001  # The port inside the container
-  type: ClusterIP  # This is the internal service type, accessible within the cluster
+  type: NodePort  # This is the internal service type, accessible within the cluster
