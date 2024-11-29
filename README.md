@@ -52,6 +52,21 @@ kubectl port-forward service/kvstore-proxy-service 8001:8001
 ```
 then visit: http://localhost:8001/docs
 
+or use Minikube:
+1. start minikube cluster:
+```sh
+minikube start
+```
+2. start the proxy service:
+```sh
+minikube service kvstore-proxy-service
+```
+Swagger URL: http://127.0.0.1:54452/docs
+
+3. check minikube dashboard:
+```sh
+minikube dashboard
+```
 
 ## API Documentation
 

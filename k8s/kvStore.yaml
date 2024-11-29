@@ -28,6 +28,8 @@ spec:
                 configMapKeyRef:
                   name: kvstore-config
                   key: REPLICA_URLS
+            - name: REPLICA_COUNT
+              value: "5"  # Hardcoded replica count
 ---
 apiVersion: v1
 kind: Service

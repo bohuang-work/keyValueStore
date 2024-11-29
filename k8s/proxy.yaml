@@ -43,6 +43,7 @@ spec:
     app: kvstore-proxy
   ports:
     - protocol: TCP
-      port: 8001  # The port on which the proxy service will be accessible
-      targetPort: 8001  # The port inside the container
-  type: NodePort  # This is the internal service type, accessible within the cluster
+      port: 8001
+      targetPort: 8001
+      nodePort: 30001  # External port to access the service from outside the cluster
+  type: NodePort

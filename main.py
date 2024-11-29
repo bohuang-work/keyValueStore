@@ -30,6 +30,7 @@ REPLICA_URLS = os.getenv(
 ).split(",")
 
 POD_NAME = os.getenv("POD_NAME", "")
+REPLICA_COUNT = os.getenv("REPLICA_COUNT", 1)
 
 
 ### Helper function to notify replicas
@@ -72,7 +73,7 @@ async def put_key_value(data: KeyValue):
     kv_store.put(data.key, data.value)
 
     # Ensure only the leader (kvstore-0) notifies replicas
-    if POD_NAME == "kvstore-0":
+    if POD_NAME == "kvstore-0" and REPLICA_COUNT > 1:
         # Notify replicas about the update
         await notify_replicas(
             endpoint="put", data={"key": data.key, "value": data.value}
@@ -96,7 +97,7 @@ async def delete_key(key: str):
         dict: A message confirming the deletion of the key-value pair.
     """
     if kv_store.delete(key):
-        if POD_NAME == "kvstore-0":
+        if POD_NAME == "kvstore-0" and REPLICA_COUNT > 1:
             await notify_replicas(endpoint="delete", data={"key": key})
         return {"message": f"Key '{key}' deleted successfully."}
     else:
